@@ -1,22 +1,22 @@
 package com.repo.wiki.wikipediasearch.api;
 
-import java.util.List;
+import com.repo.wiki.wikipediasearch.entity.WikiSearch;
 
 import io.reactivex.Single;
 import retrofit2.http.Query;
 
-interface WikiSearchApi {
-    public Single<List<String>> getWikiSearchResult(
+public interface WikiSearchApi {
+    public Single<WikiSearch> getWikiSearchResult(
             @Query("action") String action,
             @Query("format") String format,
             @Query("prop") String prop,
-            @Query("redirects") String redirects,
-            @Query("formatversion") String formatversion,
+            @Query("generator") String generator,
+            @Query("redirects") int redirects,
+            @Query("formatversion") int formatversion,
             @Query("piprop") String piprop,
             @Query("pithumbsize") int pithumbsize,
-            @Query("pilimit") int piLimit,
-            @Query("wbptterms") int wbPatterns,
-            @Query("gpssearch") String practiceId,
+            @Query("wbptterms") String wbPatterns,
+            @Query("gpssearch") String query,
             @Query("gpslimit") int limit,
             @Query("gpsoffset") int offset);
 }
