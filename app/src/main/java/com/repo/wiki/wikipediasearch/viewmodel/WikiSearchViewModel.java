@@ -17,7 +17,7 @@ public class WikiSearchViewModel extends ViewModel {
     private ObservableField<String> searchView = new ObservableField<>();
     public ObservableField<Boolean> progressState = new ObservableField<>(false);
     public ObservableField<Boolean> noResultState = new ObservableField<>(false);
-    private ObservableField<String> noResultString = new ObservableField<>();
+    public ObservableField<String> noResultString = new ObservableField<>();
     private PublishSubject<String> searchTextSubject = PublishSubject.create();
 
     public void setSearchView(String searchQuery) {

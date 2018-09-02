@@ -34,7 +34,7 @@
             android:layout_weight="1"
             android:gravity="center"
             android:layout_gravity="center"
-            android:text="No Result Found"
+            android:text="@{wikiSearchViewModel.noResultString}"
             android:visibility="@{wikiSearchViewModel.noResultState ? View.VISIBLE : View.GONE}"/>
 
         <android.support.v7.widget.RecyclerView

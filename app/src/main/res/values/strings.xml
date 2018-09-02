@@ -1,4 +1,5 @@
 <resources>
     <string name="app_name">WikipediaSearch</string>
     <string name="search">Search</string>
+    <string name="wiki_search">Wiki Search</string>
 </resources>

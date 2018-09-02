@@ -36,6 +36,7 @@
                 android:paddingRight="8dp"
                 android:textColor="@color/white"
                 android:textSize="24sp"
+                android:text="@string/wiki_search"
                 tools:text="Wiki Search" />
 
             <EditText
