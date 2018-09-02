@@ -6,15 +6,17 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
+import android.text.TextUtils;
 import android.util.Log;
 
 import com.repo.wiki.wikipediasearch.R;
+import com.repo.wiki.wikipediasearch.WikiSearchApplication;
 import com.repo.wiki.wikipediasearch.api.WikiSearchApi;
 import com.repo.wiki.wikipediasearch.databinding.ActivityWikiSearchBinding;
 import com.repo.wiki.wikipediasearch.entity.WikiSearch;
 import com.repo.wiki.wikipediasearch.interfaces.WikiSearchAdapterListener;
 import com.repo.wiki.wikipediasearch.repository.WikiSearchRepository;
-import com.repo.wiki.wikipediasearch.utils.RetrofitClientInstance;
+import com.repo.wiki.wikipediasearch.utils.ConnectionUtils;
 import com.repo.wiki.wikipediasearch.viewmodel.WikiSearchViewModel;
 
 import java.io.UnsupportedEncodingException;
@@ -43,7 +45,7 @@ public class WikiSearchActivity extends AppCompatActivity implements WikiSearchA
         activityWikiSearchBinding.setWikiSearchViewModel(wikiSearchViewModel);
         wikiSearchViewModel.getSearchQueryObservable().subscribe(new SearchTextObserver());
         wikiSearchRepository = new WikiSearchRepository(
-                RetrofitClientInstance.getRetrofitInstance().create(WikiSearchApi.class));
+                WikiSearchApplication.getRetrofitInstance(getApplicationContext()).create(WikiSearchApi.class));
         wikiSearchAdapter = new WikiSearchAdapter(this);
         activityWikiSearchBinding.recyclerView.setLayoutManager(new LinearLayoutManager(this,
                 LinearLayoutManager.VERTICAL, false));
@@ -51,26 +53,31 @@ public class WikiSearchActivity extends AppCompatActivity implements WikiSearchA
     }
 
     private void loadData(String query) {
-
+        if (TextUtils.isEmpty(query)) {
+            return;
+        }
+        final boolean isNetConnected = ConnectionUtils.isNetConnected(this);
         disposable.add(wikiSearchViewModel.loadData(wikiSearchRepository, query)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribeWith(
-                        new DisposableSingleObserver<WikiSearch>() {
-                            @Override
-                            public void onSuccess(WikiSearch wikiSearch) {
-                                if(wikiSearch.query.pages.size() == 0) {
-                                    wikiSearchViewModel.setNoResultState(true);
-                                }
-                                wikiSearchViewModel.setProgressState(false);
-                                wikiSearchAdapter.setItems(wikiSearch.query.pages);
-                            }
+                .subscribeWith(new DisposableSingleObserver<WikiSearch>() {
+                    @Override
+                    public void onSuccess(WikiSearch wikiSearch) {
+                        if (wikiSearch.query.pages.size() == 0) {
+                            wikiSearchViewModel.setNoResultState(true, isNetConnected);
+                        }
+                        wikiSearchViewModel.setProgressState(false);
+                        wikiSearchAdapter.setItems(wikiSearch.query.pages);
+                    }
 
-                            @Override
-                            public void onError(Throwable e) {
-
-                            }
-                        }));
+                    @Override
+                    public void onError(Throwable e) {
+                        wikiSearchAdapter.setItems(null);
+                        wikiSearchViewModel.setNoResultState(true, isNetConnected);
+                        wikiSearchViewModel.setProgressState(false);
+                        Log.d(WikiSearchActivity.this.getLocalClassName(), "");
+                    }
+                }));
     }
 
     @Override

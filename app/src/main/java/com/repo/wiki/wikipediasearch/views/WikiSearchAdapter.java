@@ -28,7 +28,9 @@ public class WikiSearchAdapter extends RecyclerView.Adapter<WikiSearchAdapter.Vi
 
     public void setItems(ArrayList<Pages> pages) {
         this.pages.clear();
-        this.pages.addAll(pages);
+        if(pages != null) {
+            this.pages.addAll(pages);
+        }
         notifyDataSetChanged();
     }
 

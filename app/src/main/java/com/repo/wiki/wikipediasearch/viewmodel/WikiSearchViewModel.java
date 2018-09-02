@@ -1,9 +1,7 @@
 package com.repo.wiki.wikipediasearch.viewmodel;
 
 import android.arch.lifecycle.ViewModel;
-import android.databinding.Bindable;
 import android.databinding.ObservableField;
-import android.util.Log;
 
 import com.repo.wiki.wikipediasearch.entity.WikiSearch;
 import com.repo.wiki.wikipediasearch.repository.WikiSearchRepository;
@@ -19,12 +17,12 @@ public class WikiSearchViewModel extends ViewModel {
     private ObservableField<String> searchView = new ObservableField<>();
     public ObservableField<Boolean> progressState = new ObservableField<>(false);
     public ObservableField<Boolean> noResultState = new ObservableField<>(false);
+    private ObservableField<String> noResultString = new ObservableField<>();
     private PublishSubject<String> searchTextSubject = PublishSubject.create();
 
     public void setSearchView(String searchQuery) {
         searchView.set(searchQuery);
         searchTextSubject.onNext(searchQuery);
-        Log.d("salman", searchQuery);
     }
 
     public String getSearchView() {
@@ -39,13 +37,19 @@ public class WikiSearchViewModel extends ViewModel {
         progressState.set(state);
     }
 
-    public void setNoResultState(boolean state) {
+
+    public void setNoResultState(boolean state, boolean isNetConnected) {
         noResultState.set(state);
+        if(isNetConnected) {
+            noResultString.set("No Result Found");
+        } else {
+            noResultString.set("Connect to internet");
+        }
     }
 
     public Single<WikiSearch> loadData(WikiSearchRepository wikiSearchRepository, String query) {
         setProgressState(true);
-        setNoResultState(false);
+        noResultState.set(false);
         return wikiSearchRepository.getWikiResult(10, 0, query);
     }
 }
