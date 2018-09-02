@@ -5,6 +5,7 @@ import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
 import android.util.Log;
 
 import com.repo.wiki.wikipediasearch.R;
@@ -27,6 +28,7 @@ public class WikiSearchActivity extends AppCompatActivity {
     private WikiSearchViewModel wikiSearchViewModel;
     private WikiSearchRepository wikiSearchRepository;
     private CompositeDisposable disposable = new CompositeDisposable();
+    private WikiSearchAdapter wikiSearchAdapter;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -38,6 +40,10 @@ public class WikiSearchActivity extends AppCompatActivity {
         wikiSearchViewModel.getSearchQueryObservable().subscribe(new SearchTextObserver());
         wikiSearchRepository = new WikiSearchRepository(
                 RetrofitClientInstance.getRetrofitInstance().create(WikiSearchApi.class));
+        wikiSearchAdapter = new WikiSearchAdapter();
+        activityWikiSearchBinding.recyclerView.setLayoutManager(new LinearLayoutManager(this,
+                LinearLayoutManager.VERTICAL, false));
+        activityWikiSearchBinding.recyclerView.setAdapter(wikiSearchAdapter);
     }
 
     private void loadData(String query) {
@@ -48,7 +54,7 @@ public class WikiSearchActivity extends AppCompatActivity {
                 new DisposableSingleObserver<WikiSearch>() {
                     @Override
                     public void onSuccess(WikiSearch wikiSearch) {
-
+                        wikiSearchAdapter.setItems(wikiSearch.query.pages);
                     }
 
                     @Override
@@ -80,5 +86,11 @@ public class WikiSearchActivity extends AppCompatActivity {
         public void onComplete() {
 
         }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        disposable.dispose();
     }
 }
