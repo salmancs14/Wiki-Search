@@ -12,9 +12,13 @@ import com.repo.wiki.wikipediasearch.R;
 import com.repo.wiki.wikipediasearch.api.WikiSearchApi;
 import com.repo.wiki.wikipediasearch.databinding.ActivityWikiSearchBinding;
 import com.repo.wiki.wikipediasearch.entity.WikiSearch;
+import com.repo.wiki.wikipediasearch.interfaces.WikiSearchAdapterListener;
 import com.repo.wiki.wikipediasearch.repository.WikiSearchRepository;
 import com.repo.wiki.wikipediasearch.utils.RetrofitClientInstance;
 import com.repo.wiki.wikipediasearch.viewmodel.WikiSearchViewModel;
+
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 
 import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -23,7 +27,7 @@ import io.reactivex.disposables.Disposable;
 import io.reactivex.observers.DisposableSingleObserver;
 import io.reactivex.schedulers.Schedulers;
 
-public class WikiSearchActivity extends AppCompatActivity {
+public class WikiSearchActivity extends AppCompatActivity implements WikiSearchAdapterListener {
 
     private WikiSearchViewModel wikiSearchViewModel;
     private WikiSearchRepository wikiSearchRepository;
@@ -40,28 +44,46 @@ public class WikiSearchActivity extends AppCompatActivity {
         wikiSearchViewModel.getSearchQueryObservable().subscribe(new SearchTextObserver());
         wikiSearchRepository = new WikiSearchRepository(
                 RetrofitClientInstance.getRetrofitInstance().create(WikiSearchApi.class));
-        wikiSearchAdapter = new WikiSearchAdapter();
+        wikiSearchAdapter = new WikiSearchAdapter(this);
         activityWikiSearchBinding.recyclerView.setLayoutManager(new LinearLayoutManager(this,
                 LinearLayoutManager.VERTICAL, false));
         activityWikiSearchBinding.recyclerView.setAdapter(wikiSearchAdapter);
     }
 
     private void loadData(String query) {
+
         disposable.add(wikiSearchViewModel.loadData(wikiSearchRepository, query)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeWith(
-                new DisposableSingleObserver<WikiSearch>() {
-                    @Override
-                    public void onSuccess(WikiSearch wikiSearch) {
-                        wikiSearchAdapter.setItems(wikiSearch.query.pages);
-                    }
+                        new DisposableSingleObserver<WikiSearch>() {
+                            @Override
+                            public void onSuccess(WikiSearch wikiSearch) {
+                                if(wikiSearch.query.pages.size() == 0) {
+                                    wikiSearchViewModel.setNoResultState(true);
+                                }
+                                wikiSearchViewModel.setProgressState(false);
+                                wikiSearchAdapter.setItems(wikiSearch.query.pages);
+                            }
 
-                    @Override
-                    public void onError(Throwable e) {
+                            @Override
+                            public void onError(Throwable e) {
 
-                    }
-                }));
+                            }
+                        }));
+    }
+
+    @Override
+    public void onWikiItemClick(String title) {
+        try {
+            String query = URLEncoder.encode(title, "utf-8");
+            String url = "https://en.wikipedia.org/wiki/" + query;
+            Bundle bundle = new Bundle();
+            bundle.putString(WebActivity.BUNDLE_URL, url);
+            WebActivity.start(this, bundle);
+        } catch (UnsupportedEncodingException e) {
+            Log.d(this.getLocalClassName(), e.getLocalizedMessage());
+        }
     }
 
     private class SearchTextObserver implements Observer<String> {

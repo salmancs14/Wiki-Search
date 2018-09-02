@@ -1,12 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:bind="http://schemas.android.com/apk/res-auto">
+    xmlns:bind="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
 
     <data>
 
         <variable
             name="wikiSearchViewModel"
             type="com.repo.wiki.wikipediasearch.viewmodel.WikiSearchViewModel" />
+        <import type="android.view.View" />
 
     </data>
 
@@ -18,6 +20,22 @@
         <include
             layout="@layout/toolbar_wiki_search"
             bind:toolbarWithSearchViewModel="@{wikiSearchViewModel}"/>
+
+        <ProgressBar
+            android:layout_width="72dp"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:layout_gravity="center"
+            android:visibility="@{wikiSearchViewModel.progressState ? View.VISIBLE : View.GONE}"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:layout_gravity="center"
+            android:text="No Result Found"
+            android:visibility="@{wikiSearchViewModel.noResultState ? View.VISIBLE : View.GONE}"/>
 
         <android.support.v7.widget.RecyclerView
             android:id="@+id/recyclerView"

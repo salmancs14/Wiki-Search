@@ -11,6 +11,7 @@ import android.widget.TextView;
 
 import com.repo.wiki.wikipediasearch.R;
 import com.repo.wiki.wikipediasearch.entity.Pages;
+import com.repo.wiki.wikipediasearch.interfaces.WikiSearchAdapterListener;
 import com.repo.wiki.wikipediasearch.utils.GlideApp;
 
 import java.util.ArrayList;
@@ -18,9 +19,11 @@ import java.util.ArrayList;
 public class WikiSearchAdapter extends RecyclerView.Adapter<WikiSearchAdapter.ViewHolder> {
 
     private ArrayList<Pages> pages;
+    private WikiSearchAdapterListener wikiSearchAdapterListener;
 
-    WikiSearchAdapter() {
+    WikiSearchAdapter(WikiSearchAdapterListener wikiSearchAdapterListener) {
         pages = new ArrayList<>();
+        this.wikiSearchAdapterListener = wikiSearchAdapterListener;
     }
 
     public void setItems(ArrayList<Pages> pages) {
@@ -37,7 +40,7 @@ public class WikiSearchAdapter extends RecyclerView.Adapter<WikiSearchAdapter.Vi
     }
 
     @Override
-    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull final ViewHolder holder, int position) {
         holder.titleTextView.setText(pages.get(position).title);
         if (pages.get(position).terms.description.size() > 0) {
             holder.description.setText(pages.get(position).terms.description.get(0));
@@ -50,6 +53,12 @@ public class WikiSearchAdapter extends RecyclerView.Adapter<WikiSearchAdapter.Vi
                     .placeholder(R.drawable.ic_launcher_background)
                     .into(holder.imageView);
         }
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                wikiSearchAdapterListener.onWikiItemClick(pages.get(holder.getAdapterPosition()).title);
+            }
+        });
     }
 
     @Override

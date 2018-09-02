@@ -17,6 +17,8 @@ import io.reactivex.subjects.PublishSubject;
 public class WikiSearchViewModel extends ViewModel {
 
     private ObservableField<String> searchView = new ObservableField<>();
+    public ObservableField<Boolean> progressState = new ObservableField<>(false);
+    public ObservableField<Boolean> noResultState = new ObservableField<>(false);
     private PublishSubject<String> searchTextSubject = PublishSubject.create();
 
     public void setSearchView(String searchQuery) {
@@ -33,7 +35,17 @@ public class WikiSearchViewModel extends ViewModel {
         return searchTextSubject.debounce(300, TimeUnit.MILLISECONDS);
     }
 
+    public void setProgressState(boolean state) {
+        progressState.set(state);
+    }
+
+    public void setNoResultState(boolean state) {
+        noResultState.set(state);
+    }
+
     public Single<WikiSearch> loadData(WikiSearchRepository wikiSearchRepository, String query) {
+        setProgressState(true);
+        setNoResultState(false);
         return wikiSearchRepository.getWikiResult(10, 0, query);
     }
 }
