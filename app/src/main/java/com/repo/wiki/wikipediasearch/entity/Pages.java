@@ -2,28 +2,36 @@ package com.repo.wiki.wikipediasearch.entity;
 
 import com.google.gson.annotations.SerializedName;
 
+import java.util.ArrayList;
+
 public class Pages {
     @SerializedName("pageid")
     public int pageId;
 
     @SerializedName("title")
-    public int title;
+    public String title;
 
     @SerializedName("thumbnail")
     public PageThumbnail thumbnail = new PageThumbnail();
 
-
     @SerializedName("terms")
     public Terms terms = new Terms();
 
-    public static class PageThumbnail {
+    public class PageThumbnail {
         @SerializedName("source")
         public String source;
+
+        @SerializedName("width")
+        public int width;
+
+        @SerializedName("height")
+        public int height;
+
     }
 
-    public static class Terms {
+    public class Terms {
         @SerializedName("description")
-        public String description;
+        public ArrayList<String> description = new ArrayList<>();
     }
 
 }

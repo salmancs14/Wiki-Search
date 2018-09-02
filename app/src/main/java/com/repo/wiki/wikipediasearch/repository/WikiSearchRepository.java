@@ -15,7 +15,7 @@ public class WikiSearchRepository {
 
     public Single<WikiSearch> getWikiResult(int limit, int offset, String query) {
         return wikiSearchApi.getWikiSearchResult("query", "json",
-                "pageimages%7Cpageterms", "prefixsearch", 1, 2,
+                "pageimages|pageterms", "prefixsearch", 1, 2,
                 "thumbnail", 100, "description", query, limit, offset);
     }
 }

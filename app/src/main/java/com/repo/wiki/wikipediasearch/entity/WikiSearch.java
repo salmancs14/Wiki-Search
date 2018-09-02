@@ -6,5 +6,11 @@ import java.util.ArrayList;
 
 public class WikiSearch {
     @SerializedName("query")
-    public ArrayList pages = new ArrayList<Pages>();
+    public Query query = new Query();
+
+    public class Query {
+        @SerializedName("pages")
+        public ArrayList<Pages> pages = new ArrayList<>();
+
+    }
 }
